@@ -7,8 +7,8 @@
 }
 
 body {
-  background: #FAF6F0;
-  color: #2D2821;
+  background: #EFE7DE;
+  color: #3A2E28;
   overscroll-behavior-y: none;
 }
 
@@ -19,3 +19,4 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
