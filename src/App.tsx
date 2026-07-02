@@ -44,58 +44,13 @@ function uid() {
 function loadTasks(): Task[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return seedTasks();
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    return seedTasks();
+    if (Array.isArray(parsed)) return parsed;
+    return [];
   } catch {
-    return seedTasks();
+    return [];
   }
-}
-
-function seedTasks(): Task[] {
-  return [
-    {
-      id: uid(),
-      name: "Reply to Mia's email",
-      energy: "Low",
-      time: "5 min",
-      list: "Work",
-      done: false,
-      createdAt: Date.now() - 4000,
-      subtasks: [],
-    },
-    {
-      id: uid(),
-      name: "Fold laundry",
-      energy: "Low",
-      time: "15 min",
-      list: "Home",
-      done: false,
-      createdAt: Date.now() - 3000,
-      subtasks: [],
-    },
-    {
-      id: uid(),
-      name: "Prep dinner ingredients",
-      energy: "Medium",
-      time: "15 min",
-      list: "Home",
-      done: false,
-      createdAt: Date.now() - 2000,
-      subtasks: [],
-    },
-    {
-      id: uid(),
-      name: "Finish Moodboard PR",
-      energy: "High",
-      time: "1 hr",
-      list: "Work",
-      done: false,
-      createdAt: Date.now() - 1000,
-      subtasks: [],
-    },
-  ];
 }
 
 // ── App ──────────────────────────────────────────────────────────────────
@@ -202,8 +157,21 @@ export default function App() {
           </button>
         )}
 
+        {/* First-time onboarding — no tasks ever added */}
+        {tasks.length === 0 && (
+          <div className="relative rounded-[26px] bg-focuscard p-6 mb-6 text-center shadow-[0_6px_0_#E4C98E,0_8px_16px_rgba(180,130,60,0.15)]">
+            <p className="font-display text-3xl font-bold text-terracotta mb-2">Nothing here yet.</p>
+            <p className="text-sm font-semibold text-muted mb-1">
+              Whatever's on your mind — big or tiny — just get it out of your head.
+            </p>
+            <p className="text-sm font-bold text-golddeep mt-3">
+              Tap the + button below to add your first task ↘
+            </p>
+          </div>
+        )}
+
         {/* Focus card */}
-        {focusTask ? (
+        {tasks.length > 0 && focusTask ? (
           <div className="rounded-[26px] bg-focuscard p-5 mb-6 shadow-[0_6px_0_#E4C98E,0_8px_16px_rgba(180,130,60,0.15)]">
             <div className="flex items-center justify-between mb-3">
               <p className="inline-block text-[10px] font-extrabold tracking-[0.1em] text-golddeep bg-goldpill rounded-lg px-2 py-1">
@@ -264,12 +232,12 @@ export default function App() {
               Break this into steps
             </button>
           </div>
-        ) : (
+        ) : tasks.length > 0 ? (
           <div className="rounded-[26px] bg-focuscard p-6 mb-6 text-center shadow-[0_6px_0_#E4C98E,0_8px_16px_rgba(180,130,60,0.15)]">
             <p className="font-display text-3xl font-bold text-terracotta mb-1">All clear.</p>
             <p className="text-sm font-semibold text-muted">Nothing on your plate right now. Nice work.</p>
           </div>
-        )}
+        ) : null}
 
         {/* Up next */}
         {upNext.length > 0 && (
