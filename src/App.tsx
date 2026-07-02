@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, ListPlus, Check, RotateCcw, Sparkles } from "lucide-react";
+import { Plus, ListPlus, Check, RotateCcw, Sparkles, Pencil, Trash2 } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -104,6 +104,7 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>(loadTasks);
   const [addOpen, setAddOpen] = useState(false);
   const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
@@ -126,6 +127,14 @@ export default function App() {
     if (lastDone) {
       setTasks((prev) => prev.map((t) => (t.id === lastDone.id ? { ...t, done: false } : t)));
     }
+  }
+
+  function updateTask(id: string, updates: Partial<Pick<Task, "name" | "energy" | "time" | "list">>) {
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+  }
+
+  function deleteTask(id: string) {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
   }
 
   function addTask(newTask: Omit<Task, "id" | "createdAt" | "done" | "subtasks">) {
@@ -196,9 +205,18 @@ export default function App() {
         {/* Focus card */}
         {focusTask ? (
           <div className="rounded-xl2 border-[1.5px] border-sage/40 bg-sage/[0.08] p-5 mb-6">
-            <p className="text-[11px] font-semibold tracking-[0.2em] text-sagedeep mb-3">
-              RIGHT NOW
-            </p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[11px] font-semibold tracking-[0.2em] text-sagedeep">
+                RIGHT NOW
+              </p>
+              <button
+                aria-label="Edit task"
+                onClick={() => setEditingTask(focusTask)}
+                className="text-muted hover:text-ink transition-colors"
+              >
+                <Pencil size={14} />
+              </button>
+            </div>
             <div className="flex items-center gap-3">
               <button
                 aria-label="Mark task complete"
@@ -268,7 +286,7 @@ export default function App() {
                     onClick={() => completeTask(t.id)}
                     className="shrink-0 w-5 h-5 rounded-full border-[1.5px] border-muted/50 bg-white hover:border-sage transition-colors"
                   />
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-[15px] font-medium truncate">{t.name}</p>
                     <span
                       className={`inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-md border ${LIST_COLORS[t.list]}`}
@@ -276,6 +294,13 @@ export default function App() {
                       {t.list}
                     </span>
                   </div>
+                  <button
+                    aria-label="Edit task"
+                    onClick={() => setEditingTask(t)}
+                    className="shrink-0 text-muted hover:text-ink transition-colors p-1"
+                  >
+                    <Pencil size={14} />
+                  </button>
                 </div>
               ))}
             </div>
@@ -301,6 +326,21 @@ export default function App() {
           onSave={(task) => {
             addTask(task);
             setAddOpen(false);
+          }}
+        />
+      )}
+
+      {editingTask && (
+        <EditTaskSheet
+          task={editingTask}
+          onClose={() => setEditingTask(null)}
+          onSave={(updates) => {
+            updateTask(editingTask.id, updates);
+            setEditingTask(null);
+          }}
+          onDelete={() => {
+            deleteTask(editingTask.id);
+            setEditingTask(null);
           }}
         />
       )}
@@ -393,6 +433,114 @@ function QuickAddSheet({
         >
           Add task
         </button>
+      </div>
+    </div>
+  );
+}
+
+function EditTaskSheet({
+  task,
+  onClose,
+  onSave,
+  onDelete,
+}: {
+  task: Task;
+  onClose: () => void;
+  onSave: (updates: Partial<Pick<Task, "name" | "energy" | "time" | "list">>) => void;
+  onDelete: () => void;
+}) {
+  const [name, setName] = useState(task.name);
+  const [energy, setEnergy] = useState<Energy>(task.energy);
+  const [time, setTime] = useState(task.time);
+  const [list, setList] = useState<ListName>(task.list);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  function handleSave() {
+    if (!name.trim()) return;
+    onSave({ name: name.trim(), energy, time, list });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/30 flex items-end sm:items-center sm:justify-center">
+      <div className="w-full sm:max-w-md bg-cream rounded-t-3xl sm:rounded-3xl px-6 pt-6 pb-8 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={onClose} className="text-[15px] font-medium text-muted">
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!name.trim()}
+            className="text-[15px] font-semibold text-terracotta disabled:text-muted/40"
+          >
+            Save
+          </button>
+        </div>
+
+        <textarea
+          autoFocus
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          rows={2}
+          className="w-full resize-none rounded-xl2 border-[1.5px] border-terracotta/50 bg-white px-4 py-4 text-lg font-medium placeholder:text-muted focus:outline-none focus:border-terracotta"
+        />
+
+        <div className="mt-6" />
+
+        <ChipGroup
+          label="Energy needed"
+          options={["Low", "Medium", "High"] as Energy[]}
+          value={energy}
+          onChange={setEnergy}
+        />
+        <ChipGroup
+          label="Roughly how long?"
+          options={["2 min", "15 min", "1 hr", "Not sure"]}
+          value={time}
+          onChange={setTime}
+        />
+        <ChipGroup
+          label="List"
+          options={["Home", "Work", "Personal"] as ListName[]}
+          value={list}
+          onChange={setList}
+          dotColors={LIST_DOT}
+        />
+
+        <button
+          onClick={handleSave}
+          disabled={!name.trim()}
+          className="w-full mt-6 rounded-2xl bg-terracotta disabled:bg-muted/30 text-white font-semibold py-4 text-[16px] active:scale-[0.99] transition"
+        >
+          Save changes
+        </button>
+
+        {!confirmingDelete ? (
+          <button
+            onClick={() => setConfirmingDelete(true)}
+            className="w-full mt-3 flex items-center justify-center gap-1.5 rounded-2xl border border-red-200 text-red-500 font-medium py-3.5 text-[14px] active:scale-[0.99] transition"
+          >
+            <Trash2 size={15} />
+            Delete task
+          </button>
+        ) : (
+          <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 p-4">
+            <p className="text-[13px] text-red-700 mb-3">Delete this task? This can't be undone.</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirmingDelete(false)}
+                className="flex-1 rounded-xl bg-white border border-line py-2.5 text-[13px] font-medium text-ink"
+              >
+                Keep it
+              </button>
+              <button
+                onClick={onDelete}
+                className="flex-1 rounded-xl bg-red-500 py-2.5 text-[13px] font-semibold text-white"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
