@@ -26,9 +26,9 @@ interface Task {
 const STORAGE_KEY = "adhd-tasks-v1";
 
 const LIST_COLORS: Record<ListName, string> = {
-  Home: "bg-sage/15 text-sagedeep border-sage/40",
-  Work: "bg-terracotta/15 text-terracotta border-terracotta/40",
-  Personal: "bg-sky/15 text-sky border-sky/40",
+  Home: "bg-sage text-white",
+  Work: "bg-terracotta text-white",
+  Personal: "bg-sky text-white",
 };
 
 const LIST_DOT: Record<ListName, string> = {
@@ -179,14 +179,14 @@ export default function App() {
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <p className="text-sm font-medium text-muted">
+            <p className="text-sm font-semibold text-muted">
               {new Date().toLocaleDateString(undefined, {
                 weekday: "long",
                 month: "long",
                 day: "numeric",
               })}
             </p>
-            <h1 className="font-display text-3xl font-semibold leading-tight mt-1">
+            <h1 className="font-display text-[40px] leading-[0.95] font-bold text-terracotta mt-1">
               One thing at a time.
             </h1>
           </div>
@@ -204,9 +204,9 @@ export default function App() {
 
         {/* Focus card */}
         {focusTask ? (
-          <div className="rounded-xl2 border-[1.5px] border-sage/40 bg-sage/[0.08] p-5 mb-6">
+          <div className="rounded-[26px] bg-focuscard p-5 mb-6 shadow-[0_6px_0_#E4C98E,0_8px_16px_rgba(180,130,60,0.15)]">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold tracking-[0.2em] text-sagedeep">
+              <p className="inline-block text-[10px] font-extrabold tracking-[0.1em] text-golddeep bg-goldpill rounded-lg px-2 py-1">
                 RIGHT NOW
               </p>
               <button
@@ -221,20 +221,20 @@ export default function App() {
               <button
                 aria-label="Mark task complete"
                 onClick={() => completeTask(focusTask.id)}
-                className="shrink-0 w-8 h-8 rounded-full border-2 border-sage bg-white flex items-center justify-center hover:bg-sage/20 active:scale-95 transition"
+                className="shrink-0 w-[26px] h-[26px] rounded-full border-2 border-gold bg-white flex items-center justify-center hover:bg-gold/20 active:scale-95 transition"
               >
-                <Check size={16} className="text-sage opacity-0 hover:opacity-100" />
+                <Check size={14} className="text-golddeep opacity-0 hover:opacity-100" />
               </button>
-              <p className="font-display text-xl font-semibold leading-snug">
+              <p className="text-[17px] font-bold leading-snug text-ink">
                 {focusTask.name}
               </p>
             </div>
-            <p className="text-[13px] text-muted mt-2 ml-11">
+            <p className="text-[12px] font-semibold text-muted mt-2 ml-9">
               Est. {focusTask.time} · {focusTask.energy} energy needed
             </p>
 
             {focusTask.subtasks.length > 0 && (
-              <div className="mt-4 ml-11 space-y-2">
+              <div className="mt-4 ml-9 space-y-2">
                 {focusTask.subtasks.map((s) => (
                   <button
                     key={s.id}
@@ -242,13 +242,13 @@ export default function App() {
                     className="flex items-center gap-2 text-left w-full"
                   >
                     <span
-                      className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
-                        s.done ? "bg-sage border-sage" : "border-muted/50 bg-white"
+                      className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        s.done ? "bg-sage border-sage" : "border-gold/60 bg-white"
                       }`}
                     >
                       {s.done && <Check size={10} className="text-white" />}
                     </span>
-                    <span className={`text-sm ${s.done ? "line-through text-muted" : "text-ink"}`}>
+                    <span className={`text-sm font-medium ${s.done ? "line-through text-muted" : "text-ink"}`}>
                       {s.label}
                     </span>
                   </button>
@@ -258,40 +258,40 @@ export default function App() {
 
             <button
               onClick={() => setBreakdownOpen(true)}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-[13px] font-medium text-terracotta shadow-sm hover:shadow transition-shadow"
+              className="mt-4 ml-9 inline-flex items-center gap-1.5 rounded-2xl bg-terracotta px-3.5 py-2 text-[12px] font-bold text-white shadow-[0_3px_0_#8F4436] active:translate-y-[2px] active:shadow-none transition"
             >
-              <Sparkles size={14} />
+              <Sparkles size={13} />
               Break this into steps
             </button>
           </div>
         ) : (
-          <div className="rounded-xl2 border-[1.5px] border-sage/40 bg-sage/[0.08] p-6 mb-6 text-center">
-            <p className="font-display text-xl font-semibold mb-1">All clear.</p>
-            <p className="text-sm text-muted">Nothing on your plate right now. Nice work.</p>
+          <div className="rounded-[26px] bg-focuscard p-6 mb-6 text-center shadow-[0_6px_0_#E4C98E,0_8px_16px_rgba(180,130,60,0.15)]">
+            <p className="font-display text-3xl font-bold text-terracotta mb-1">All clear.</p>
+            <p className="text-sm font-semibold text-muted">Nothing on your plate right now. Nice work.</p>
           </div>
         )}
 
         {/* Up next */}
         {upNext.length > 0 && (
           <>
-            <p className="font-semibold text-sm mb-3">Up next ({upNext.length})</p>
+            <p className="font-extrabold text-sm mb-3 text-ink">Up next ({upNext.length})</p>
             <div className="space-y-2.5 mb-6">
               {upNext.map((t) => (
                 <div
                   key={t.id}
-                  className="flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-3.5"
+                  className="flex items-center gap-3 rounded-2xl bg-white px-3.5 py-3 shadow-[0_3px_0_#DDD2C2]"
                 >
                   <button
                     aria-label="Mark task complete"
                     onClick={() => completeTask(t.id)}
-                    className="shrink-0 w-5 h-5 rounded-full border-[1.5px] border-muted/50 bg-white hover:border-sage transition-colors"
+                    className="shrink-0 w-[18px] h-[18px] rounded-full border-2 border-muted/50 bg-white hover:border-gold transition-colors"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[15px] font-medium truncate">{t.name}</p>
+                    <p className="text-[14px] font-bold truncate text-ink">{t.name}</p>
                     <span
-                      className={`inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded-md border ${LIST_COLORS[t.list]}`}
+                      className={`inline-block mt-1 text-[9px] font-extrabold px-2 py-0.5 rounded-lg ${LIST_COLORS[t.list]}`}
                     >
-                      {t.list}
+                      {t.list.toUpperCase()}
                     </span>
                   </div>
                   <button
@@ -315,7 +315,7 @@ export default function App() {
       <button
         onClick={() => setAddOpen(true)}
         aria-label="Add task"
-        className="fixed bottom-8 right-6 sm:right-[calc(50%-224px+24px)] w-14 h-14 rounded-full bg-terracotta text-white flex items-center justify-center shadow-lg shadow-terracotta/30 active:scale-95 transition"
+        className="fixed bottom-8 right-6 sm:right-[calc(50%-224px+24px)] w-14 h-14 rounded-full bg-terracotta text-white flex items-center justify-center shadow-[0_5px_0_#8F4436] active:translate-y-[3px] active:shadow-none transition text-[28px] font-normal"
       >
         <Plus size={26} />
       </button>
@@ -569,10 +569,10 @@ function ChipGroup<T extends string>({
             <button
               key={opt}
               onClick={() => onChange(opt)}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[13px] font-medium border transition-colors ${
+              className={`flex items-center gap-1.5 rounded-2xl px-4 py-2.5 text-[13px] font-bold transition-all ${
                 selected
-                  ? "bg-terracotta/15 border-terracotta text-ink"
-                  : "bg-white border-line text-muted"
+                  ? "bg-terracotta text-white shadow-[0_3px_0_#8F4436]"
+                  : "bg-white text-muted shadow-[0_3px_0_#DDD2C2]"
               }`}
             >
               {dotColors && (
