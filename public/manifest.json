@@ -1,0 +1,21 @@
+{
+  "name": "One Thing At A Time",
+  "short_name": "Right Now",
+  "description": "A one-thing-at-a-time task manager built for ADHD brains.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EFE7DE",
+  "theme_color": "#B85C4A",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
